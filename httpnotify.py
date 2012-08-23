@@ -18,9 +18,7 @@ class notificationHTTPServer(BaseHTTPRequestHandler):
             return
 
         cmd = ['/Applications/terminal-notifier.app/Contents/MacOS/terminal-notifier']
-        # some nasty stuff here... messages beginning with weird characters fail 
-        # if not wrapped in double quotes even though shell=False in sunprocess.
-        # wrap paramaters in double quotes and escape double quotes in the message.
+        # workaround for https://github.com/alloy/terminal-notifier/issues/11
         cmd.extend( [ '-message', '"%s"' % form['message'].value.replace('"', '\\"') ] )
 
         # terminal-notifier supports 'activate' for bundles and 'command'

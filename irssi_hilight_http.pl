@@ -86,7 +86,15 @@ sub _send_post {
   my ($subtitle, $message) = @_;
   my $subtitle = uri_escape($subtitle);
   my $message = uri_escape($message);
-  system("/usr/bin/curl", $CONFIG{url}, "-s", "-d", "title=irssi&subtitle=$subtitle&message=$message");
+
+  my $pid = fork();
+  if ($pid > 0) {
+    Irssi::pidwait_add($pid);
+    return;
+  } else {
+    system("/usr/bin/curl", $CONFIG{url}, "--connect-timeout", "5", "-s", "-d", "title=irssi&subtitle=$subtitle&message=$message");
+    POSIX::_exit(0);
+  }
 }
  
 #--------------------------------------------------------------------
