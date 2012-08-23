@@ -18,7 +18,10 @@ class notificationHTTPServer(BaseHTTPRequestHandler):
             return
 
         cmd = ['/Applications/terminal-notifier.app/Contents/MacOS/terminal-notifier']
-        cmd.extend( ['-message', form['message'].value] )
+        # some nasty stuff here... messages beginning with weird characters fail 
+        # if not wrapped in double quotes even though shell=False in sunprocess.
+        # wrap paramaters in double quotes and escape double quotes in the message.
+        cmd.extend( [ '-message', '"%s"' % form['message'].value.replace('"', '\\"') ] )
 
         # terminal-notifier supports 'activate' for bundles and 'command'
         # for executing commands but this is potentitally dangerous
@@ -27,7 +30,7 @@ class notificationHTTPServer(BaseHTTPRequestHandler):
         for field in form.keys():
             if field not in valid_args:
                 continue
-            cmd.extend( ['-%s' % field, form[field].value] )
+            cmd.extend( [ '-%s' % field, '"%s"' % form[field].value.replace('"', '\\"') ] )
 
         subprocess.call(cmd)
 
